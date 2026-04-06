@@ -725,36 +725,50 @@
  <input type="checkbox" id="mirrorX"> Mirror X - <input type="checkbox" id="mirrorY"> Mirror Y - <input type="checkbox" id="colorized"> Grayscale
  </p>
 
-<div style="text-align: left; max-width: 700px; margin: 0 auto; padding: 10px;">
-  <div style="margin: 8px 0;">
-    <label>Edge Brightness: <span id="edgeBrightnessVal">0.3</span></label>
-    <input type="range" id="edgeBrightness" min="0" max="1" step="0.05" value="0.3" style="width: 100%;">
-  </div>
-  <div style="margin: 8px 0;">
-    <label>Color Variations: <span id="colorVariationsVal">0.2</span></label>
-    <input type="range" id="colorVariations" min="0" max="1" step="0.05" value="0.2" style="width: 100%;">
-  </div>
-  <div style="margin: 8px 0;">
-    <label>Brightness Noise: <span id="brightnessNoiseVal">0.3</span></label>
-    <input type="range" id="brightnessNoise" min="0" max="1" step="0.05" value="0.3" style="width: 100%;">
-  </div>
-  <div style="margin: 8px 0;">
-    <label>Saturation: <span id="saturationVal">0.5</span></label>
-    <input type="range" id="saturation" min="0" max="1" step="0.05" value="0.5" style="width: 100%;">
-  </div>
-  <div style="margin: 8px 0; display: flex; gap: 20px;">
-    <div style="flex: 1;">
-      <label>Sprite Count: <span id="spriteCountVal">10</span></label>
+<div style="max-width: 700px; margin: 24px auto; text-align: left;">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div>
+      <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #cbd5e1;">
+        Edge Brightness: <span id="edgeBrightnessVal" style="color: #f97316;">0.3</span>
+      </label>
+      <input type="range" id="edgeBrightness" min="0" max="1" step="0.05" value="0.3" style="width: 100%;">
+    </div>
+    <div>
+      <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #cbd5e1;">
+        Color Variations: <span id="colorVariationsVal" style="color: #f97316;">0.2</span>
+      </label>
+      <input type="range" id="colorVariations" min="0" max="1" step="0.05" value="0.2" style="width: 100%;">
+    </div>
+    <div>
+      <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #cbd5e1;">
+        Brightness Noise: <span id="brightnessNoiseVal" style="color: #f97316;">0.3</span>
+      </label>
+      <input type="range" id="brightnessNoise" min="0" max="1" step="0.05" value="0.3" style="width: 100%;">
+    </div>
+    <div>
+      <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #cbd5e1;">
+        Saturation: <span id="saturationVal" style="color: #f97316;">0.5</span>
+      </label>
+      <input type="range" id="saturation" min="0" max="1" step="0.05" value="0.5" style="width: 100%;">
+    </div>
+    <div>
+      <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #cbd5e1;">
+        Sprite Count: <span id="spriteCountVal" style="color: #f97316;">10</span>
+      </label>
       <input type="range" id="spriteCount" min="1" max="50" value="10" style="width: 100%;">
     </div>
-    <div style="flex: 1;">
-      <label>Scale: <span id="spriteScaleVal">2</span>x</label>
+    <div>
+      <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #cbd5e1;">
+        Scale: <span id="spriteScaleVal" style="color: #f97316;">2</span>x
+      </label>
       <input type="range" id="spriteScale" min="1" max="8" value="2" style="width: 100%;">
     </div>
   </div>
-  <div style="margin: 8px 0;">
-    <label>Seed (for reproducible generation):</label>
-    <input type="number" id="generationSeed" placeholder="Leave empty for random" style="width: 150px;">
+  <div style="margin-top: 20px;">
+    <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #cbd5e1;">
+      Seed (reproducible generation):
+    </label>
+    <input type="number" id="generationSeed" placeholder="Leave empty for random" style="width: 100%; max-width: 220px;">
   </div>
 </div>
 
@@ -770,15 +784,15 @@
           <label for = "brush4">body/border 2 (4)</label>
         </p>
 
-        <p style="margin: 10px 0;">
-          <button id="clearMask">Clear Mask</button>
-          <button id="fillMask">Fill Mask</button>
-          <button id="undoBtn">Undo (Z)</button>
-          <button id="redoBtn">Redo (Y)</button>
-          <button id="saveMask">Save Mask</button>
-          <button id="loadMaskBtn">Load Mask</button>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0;">
+          <button id="clearMask" style="background: linear-gradient(135deg, #64748b, #475569);">🗑 Clear</button>
+          <button id="fillMask" style="background: linear-gradient(135deg, #64748b, #475569);">🪣 Fill</button>
+          <button id="undoBtn" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">↶ Undo</button>
+          <button id="redoBtn" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">↷ Redo</button>
+          <button id="saveMask" style="background: linear-gradient(135deg, #10b981, #059669);">💾 Save</button>
+          <button id="loadMaskBtn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">📂 Load</button>
           <input type="file" id="loadMask" accept=".json" style="display:none">
-        </p>
+        </div>
 
     </div>
     <table id="pixel_canvas"></table>
