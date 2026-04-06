@@ -68,7 +68,10 @@
             colorVariations : 0.2,
             brightnessNoise : 0.3,
             saturation      : 0.5,
-            seed             : null
+            seed             : null,
+            palette          : null,
+            outline          : 0,
+            dithering        : 0
         };
 
         // Set default options
@@ -94,6 +97,40 @@
 
         this.init();
     }
+    
+    Sprite.prototype.applyOutline = function(thickness) {
+        thickness = thickness || 1;
+        var newData = this.data.slice();
+        for (var y = 0; y < this.height; y++) {
+            for (var x = 0; x < this.width; x++) {
+                if (this.getData(x, y) > 0) {
+                    for (var dy = -thickness; dy <= thickness; dy++) {
+                        for (var dx = -thickness; dx <= thickness; dx++) {
+                            var nx = x + dx, ny = y + dy;
+                            if (nx >= 0 && nx < this.width && ny >=0 && ny < this.height) {
+                                if (this.getData(nx, ny) === 0) {
+                                    newData[ny * this.width + nx] = -1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.data = newData;
+    };
+    
+    Sprite.prototype.applyDithering = function(amount) {
+        amount = amount || 0.15;
+        for (var y = 0; y < this.height; y++) {
+            for (var x = 0; x < this.width; x++) {
+                var val = this.getData(x, y);
+                if (val > 0 && ((x + y) % 2 === 0) && this.seededRandom() < amount) {
+                    this.setData(x, y, -1);
+                }
+            }
+        }
+    };
 
 
     /**
@@ -119,6 +156,10 @@
         }
 
         this.generateEdges();
+        
+        if (this.options.outline) this.applyOutline(this.options.outline);
+        if (this.options.dithering) this.applyDithering(this.options.dithering);
+        
         this.renderPixelData();
     };
 
@@ -337,6 +378,7 @@
         var isVerticalGradient = this.seededRandom() > 0.5;
         var saturation         = Math.max(Math.min(this.seededRandom() * this.options.saturation, 1), 0);
         var hue                = this.seededRandom();
+        var palette            = this.options.palette;
 
         var u, v, ulen, vlen;
         if (isVerticalGradient) {
@@ -376,8 +418,15 @@
                          var brightness = Math.sin((u / ulen) * Math.PI) * (1 - this.options.brightnessNoise) 
                                         + this.seededRandom() * this.options.brightnessNoise;
 
-                        // Get the RGB color value
-                        this.hslToRgb(hue, saturation, brightness, /*out*/ rgb);
+                         // Get the RGB color value
+                         if (palette && palette.length > 0) {
+                             var idx = Math.floor(this.seededRandom() * palette.length);
+                             rgb.r = palette[idx][0] / 255;
+                             rgb.g = palette[idx][1] / 255;
+                             rgb.b = palette[idx][2] / 255;
+                         } else {
+                             this.hslToRgb(hue, saturation, brightness, /*out*/ rgb);
+                         }
 
                         // If this is an edge, then darken the pixel
                         if (val === -1) {
@@ -770,6 +819,50 @@
     </label>
     <input type="number" id="generationSeed" placeholder="Leave empty for random" style="width: 100%; max-width: 220px;">
   </div>
+  
+  <div style="margin-top: 20px;">
+    <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #cbd5e1;">Effects:</label>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div>
+        <label>Outline: <span id="outlineVal">0</span></label>
+        <input type="range" id="outline" min="0" max="2" value="0" style="width: 100%;">
+      </div>
+      <div>
+        <label>Dithering: <span id="ditheringVal">0</span></label>
+        <input type="range" id="dithering" min="0" max="1" step="0.05" value="0" style="width: 100%;">
+      </div>
+    </div>
+  </div>
+  
+  <div style="margin-top: 20px;">
+    <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #cbd5e1;">Color Palette:</label>
+    <select id="paletteSelect" style="width: 100%; padding: 8px; border-radius: 8px; background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.3); color: #f1f5f9;">
+      <option value="">Random HSL (Default)</option>
+      <option value="gameboy">Game Boy (4 colors)</option>
+      <option value="nes">NES Classic</option>
+      <option value="retro">Retro 16</option>
+      <option value="pico8">PICO-8</option>
+      <option value="cga">CGA Palette 1</option>
+      <option value="grayscale">Grayscale</option>
+    </select>
+  </div>
+</div>
+
+<div style="margin: 20px 0;">
+  <label style="font-weight: 500; color: #cbd5e1; display: block; margin-bottom: 10px;">Quick Templates:</label>
+  <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+    <button class="template-btn" data-template="character" style="padding: 8px 12px; font-size: 13px;">🧍 Character</button>
+    <button class="template-btn" data-template="monster" style="padding: 8px 12px; font-size: 13px;">👾 Monster</button>
+    <button class="template-btn" data-template="item" style="padding: 8px 12px; font-size: 13px;">💎 Item</button>
+    <button class="template-btn" data-template="tile" style="padding: 8px 12px; font-size: 13px;">🧱 Tile</button>
+    <button class="template-btn" data-template="spaceship" style="padding: 8px 12px; font-size: 13px;">🚀 Spaceship</button>
+    <button class="template-btn" data-template="tree" style="padding: 8px 12px; font-size: 13px;">🌲 Tree</button>
+  </div>
+</div>
+
+<div style="margin: 10px 0;">
+  <button id="exportSheet" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">📋 Export Sprite Sheet</button>
+  <button id="exportGif" style="background: linear-gradient(135deg, #a855f7, #9333ea);">🎬 Export Animation GIF</button>
 </div>
 
        <p>
@@ -829,6 +922,26 @@ let spriteCount = document.getElementById("spriteCount");
 let spriteScale = document.getElementById("spriteScale");
 let generationSeed = document.getElementById("generationSeed");
 
+// Palettes
+const PALETTES = {
+  gameboy: [[15,56,15], [48,98,48], [139,172,15], [155,188,15]],
+  nes: [[0,0,0], [124,124,124], [188,188,188], [252,252,252], [172,0,0], [252,0,0], [0,172,0], [0,252,0], [0,0,172], [0,0,252]],
+  retro: [[0,0,0], [34,32,52], [69,40,60], [102,57,49], [143,86,59], [223,113,38], [217,160,102], [238,195,154], [153,229,80], [106,190,48], [55,148,110], [75,105,47], [63,63,116], [48,96,130], [91,110,225], [100,131,219]],
+  pico8: [[0,0,0], [29,43,83], [126,37,83], [0,135,81], [171,82,54], [95,87,79], [194,195,199], [255,241,232], [255,0,77], [255,163,0], [255,236,39], [0,228,54], [41,173,255], [131,118,156], [255,119,168], [255,204,170]],
+  cga: [[0,0,0], [255,255,255], [255,0,255], [0,255,255]],
+  grayscale: [[0,0,0], [51,51,51], [102,102,102], [153,153,153], [204,204,204], [255,255,255]]
+};
+
+// Templates
+const TEMPLATES = {
+  character: {w:8,h:8,d: [1,1,1,0,0,1,1,1,0,2,1,1,1,1,2,0,0,2,1,1,1,1,2,0,0,0,1,1,1,1,0,0,0,0,2,2,2,2,0,0,0,1,1,1,1,1,1,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0,1,0]},
+  monster: {w:8,h:8,d: [0,0,1,1,1,1,0,0,0,1,2,2,2,2,1,0,1,2,1,2,2,1,2,1,1,2,2,2,2,2,2,1,1,2,1,1,1,1,2,1,0,1,2,2,2,2,1,0,0,0,1,0,0,1,0,0,0,0,1,1,1,1,0,0]},
+  item: {w:6,h:6,d: [0,2,2,2,2,0,2,1,1,1,1,2,2,1,1,1,1,2,2,1,1,1,1,2,2,1,1,1,1,2,0,2,2,2,2,0]},
+  tile: {w:8,h:8,d: [2,1,2,1,2,1,2,1,1,1,1,1,1,1,1,1,2,1,2,1,2,1,2,1,1,1,1,1,1,1,1,1,2,1,2,1,2,1,2,1,1,1,1,1,1,1,1,1,2,1,2,1,2,1,2,1,1,1,1,1,1,1,1,1]},
+  spaceship: {w:8,h:8,d: [0,0,0,1,1,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,0,1,2,1,1,1,1,2,1,1,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,1,0,0,1,0]},
+  tree: {w:7,h:10,d: [0,0,1,1,1,0,0,0,1,2,2,2,1,0,1,1,1,1,1,1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,2,1,0,1,1,1,1,1,0,0,0,0,2,2,0,0,0,0,0,0,2,2,0,0,0]}
+};
+
 // Slider value displays
 function updateSliderValue(id, val) {
   document.getElementById(id + 'Val').textContent = val;
@@ -839,6 +952,8 @@ brightnessNoise.oninput = e => updateSliderValue('brightnessNoise', e.target.val
 saturation.oninput = e => updateSliderValue('saturation', e.target.value);
 spriteCount.oninput = e => updateSliderValue('spriteCount', e.target.value);
 spriteScale.oninput = e => updateSliderValue('spriteScale', e.target.value);
+outline.oninput = e => updateSliderValue('outline', e.target.value);
+dithering.oninput = e => updateSliderValue('dithering', e.target.value);
 
 let sizePicker = document.getElementById("sizePicker");
 sizePicker.onsubmit = function(event) { event.preventDefault(); clearGrid(); makeGrid(); saveState(); };
@@ -865,6 +980,54 @@ document.getElementById("saveMask").onclick = saveMask;
 document.getElementById("loadMaskBtn").onclick = () => document.getElementById("loadMask").click();
 document.getElementById("loadMask").onchange = loadMask;
 document.getElementById("clearGenerations").onclick = clearGenerations;
+
+// Template buttons
+document.querySelectorAll('.template-btn').forEach(btn => {
+  btn.onclick = function() {
+    const t = TEMPLATES[this.dataset.template];
+    width.value = t.w;
+    height.value = t.h;
+    clearGrid();
+    makeGrid();
+    spriteValue = [...t.d];
+    redrawGrid();
+    saveState();
+  };
+});
+
+// Sprite sheet export
+document.getElementById('exportSheet').onclick = exportSpriteSheet;
+
+function exportSpriteSheet() {
+  const canvases = document.querySelectorAll(`div[id="${counter-1}] canvas`);
+  if (canvases.length === 0) return;
+  
+  const cols = Math.ceil(Math.sqrt(canvases.length));
+  const rows = Math.ceil(canvases.length / cols);
+  const w = canvases[0].width;
+  const h = canvases[0].height;
+  
+  const sheet = document.createElement('canvas');
+  sheet.width = w * cols;
+  sheet.height = h * rows;
+  const ctx = sheet.getContext('2d');
+  
+  canvases.forEach((c, i) => {
+    const x = (i % cols) * w;
+    const y = Math.floor(i / cols) * h;
+    ctx.drawImage(c, x, y);
+  });
+  
+  const a = document.createElement('a');
+  a.download = `spritesheet-${counter-1}.png`;
+  a.href = sheet.toDataURL();
+  a.click();
+}
+
+// Animation export stub
+document.getElementById('exportGif').onclick = function() {
+  alert('GIF export coming soon!');
+};
 
 // Undo/Redo
 let history = [];
