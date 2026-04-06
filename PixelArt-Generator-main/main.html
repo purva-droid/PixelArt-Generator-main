@@ -477,7 +477,231 @@
 		
 		</script>
         <style type="text/css" media="screen">
-		canvas{padding:5px}div{padding:10px 0 15px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:12px}hr{border:none;border-top:1px solid orange}body{text-align:center}.mainTitle{font-family:Audiowide,sans-serif;font-size:2rem;margin:.2em;color:#c88}.chooseTitle{margin:1em 0 .25em}table,td,tr{border:1px solid #abc}table{border-collapse:collapse;margin:40px auto}tr{height:25px}td{width:25px}input[type=number]{width:3em;margin-right:10px}input[type=submit]{margin-right:2em}@media screen and (max-width:480px){.chooseTitle,.mainTitle{font-size:1.1rem;display:inline}table{margin:10px auto}tr{height:30px}td{width:30px}}			
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+          
+          body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e4e4e7;
+            text-align: center;
+            padding: 20px;
+            line-height: 1.6;
+          }
+          
+          #container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+          }
+          
+          .mainTitle {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+          }
+          
+          .chooseTitle {
+            color: #94a3b8;
+            font-weight: 500;
+            margin: 20px 0 12px;
+            font-size: 1.1rem;
+          }
+          
+          hr {
+            border: none;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+            margin: 20px 0;
+          }
+          
+          form {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 16px 0;
+          }
+          
+          .label {
+            font-weight: 500;
+            color: #cbd5e1;
+          }
+          
+          input[type="number"] {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 8px;
+            width: 70px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+          }
+          
+          input[type="number"]:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+          }
+          
+          input[type="submit"], button {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            font-size: 14px;
+          }
+          
+          input[type="submit"]:hover, button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(249, 115, 22, 0.3);
+          }
+          
+          button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+          }
+          
+          input[type="range"] {
+            accent-color: #f97316;
+            height: 6px;
+            border-radius: 3px;
+          }
+          
+          input[type="checkbox"] {
+            accent-color: #f97316;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+          }
+          
+          input[type="radio"] {
+            accent-color: #f97316;
+            margin: 0 6px 0 12px;
+            cursor: pointer;
+          }
+          
+          p {
+            margin: 12px 0;
+          }
+          
+          table {
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 24px auto;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          }
+          
+          tr {
+            height: 24px;
+          }
+          
+          td {
+            width: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            cursor: crosshair;
+            transition: transform 0.1s;
+            background: white;
+          }
+          
+          td:hover {
+            transform: scale(1.15);
+            z-index: 10;
+            position: relative;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.5);
+          }
+          
+          canvas {
+            padding: 6px;
+            margin: 4px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            transition: transform 0.2s;
+            image-rendering: pixelated;
+          }
+          
+          canvas:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+          }
+          
+          div[id^="0"], div[id^="1"], div[id^="2"], div[id^="3"], div[id^="4"], 
+          div[id^="5"], div[id^="6"], div[id^="7"], div[id^="8"], div[id^="9"] {
+            max-width: 900px;
+            margin: 24px auto;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+          }
+          
+          a {
+            color: #f97316;
+            text-decoration: none;
+            font-weight: 500;
+          }
+          
+          a:hover {
+            text-decoration: underline;
+          }
+          
+          #generate {
+            font-size: 1.1rem;
+            padding: 12px 32px;
+            margin: 8px;
+          }
+          
+          @media screen and (max-width: 768px) {
+            body {
+              padding: 12px;
+            }
+            
+            #container {
+              padding: 18px;
+            }
+            
+            .mainTitle {
+              font-size: 1.8rem;
+            }
+            
+            form {
+              flex-direction: column;
+              gap: 12px;
+            }
+            
+            tr {
+              height: 28px;
+            }
+            
+            td {
+              width: 28px;
+            }
+          }
         </style>
     </head>
 
